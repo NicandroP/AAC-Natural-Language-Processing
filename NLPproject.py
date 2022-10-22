@@ -150,7 +150,7 @@ def getImg(id, plural_status,action): #parameter:id, plural_status[true/false], 
 import stanza
 #stanza.download('it')
 nlp=stanza.Pipeline('it',processors='tokenize,mwt,pos,lemma')
-frase="ciao, ho sognato un gatto"
+frase="corro in un campo da tennis"
 #frase= input()
 words_for_images=[]
 doc=nlp(frase)
