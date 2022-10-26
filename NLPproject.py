@@ -302,6 +302,4 @@ def startGUI():
 
   window.close()
 
-#startGUI()
-
-translate("mi")
+startGUI()
