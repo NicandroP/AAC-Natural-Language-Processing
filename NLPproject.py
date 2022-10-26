@@ -100,27 +100,28 @@ def getInfo(word):
               keywords.append(keyword)
           except:
             print("Something went wrong")
-      if(keywords[0]!=token):
-        keywords=[]
-      keywords=[s for s in keywords if s != lemma and s != word[2] ]
-      present=False
-      for keyword in keywords:
-          
-          if lemma_sentence.find(keyword)!=-1:
-              present=True
-              words=len(keyword.split(" "))
-              print(words,": ",keyword)
-              global index
-              index+=words
-              global words_for_images
-              words_for_images.append(keyword)
-              response2 = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + keyword)
-              j2=response2.json()
-              id = j2[0]['_id']
-              result.append(id)
-              index+=1
-              return result
-              break
+      if(len(keywords)>0):
+        if(keywords[0]!=token):
+          keywords=[]
+        keywords=[s for s in keywords if s != lemma and s != word[2] ]
+        present=False
+        for keyword in keywords:
+            
+            if lemma_sentence.find(keyword)!=-1:
+                present=True
+                words=len(keyword.split(" "))
+                print(words,": ",keyword)
+                global index
+                index+=words
+                global words_for_images
+                words_for_images.append(keyword)
+                response2 = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + keyword)
+                j2=response2.json()
+                id = j2[0]['_id']
+                result.append(id)
+                index+=1
+                return result
+                break
     
     response = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + lemma)
     j = response.json()
@@ -311,4 +312,3 @@ def startGUI():
   window.close()
 
 startGUI()
-
