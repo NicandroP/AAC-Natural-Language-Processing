@@ -268,13 +268,15 @@ def startGUI():
           break
       elif event == 'Translate':
           if executed==False or v!=values['-INPUT-']:
-            v = values['-INPUT-']
-            translate(v)
-            executed=True
-            window['OUTPUT'].update(value=v)
-            im = Image.open(path_CAA_pictograms+'figure.png')
-            image = ImageTk.PhotoImage(image=im)
-            window['-IMAGE-'].update(data=image)
+            if values['-INPUT-']!="":
+                
+              v = values['-INPUT-']
+              translate(v)
+              executed=True
+              window['OUTPUT'].update(value=v)
+              im = Image.open(path_CAA_pictograms+'figure.png')
+              image = ImageTk.PhotoImage(image=im)
+              window['-IMAGE-'].update(data=image)
 
       elif event=='Clear':
           window.FindElement('-INPUT-').Update('')
