@@ -37,17 +37,19 @@ def getInfo(word):
     token = word[0]
     type=word[1]
     lemma=word[2]
+    gender=""
     if(type=='DET'):
       lemma=token
     if(type=='NOUN' or type=='DET' or type=='PRON' or type=='ADJ'):
       if(word[3]!=None):
+        
 
 
         splitted=word[3].split("|")
         for i in range(len(splitted)):
             if splitted[i].find("Gender")!=-1:
               gender=splitted[i].split("=")[1]
-        if(gender=="Fem"):
+        if(gender=="Fem" and gender!=""):
           lemma=word[2][:-1]+"a" 
     #lemma=word[2]
     action = 'indef'
@@ -302,4 +304,4 @@ def startGUI():
 
 #startGUI()
 
-translate("non sopporto")
+translate("mi")
