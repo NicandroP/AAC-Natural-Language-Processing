@@ -42,15 +42,13 @@ def getInfo(word):
       lemma=token
     if(type=='NOUN' or type=='DET' or type=='PRON' or type=='ADJ'):
       if(word[3]!=None):
-        
-
 
         splitted=word[3].split("|")
         for i in range(len(splitted)):
             if splitted[i].find("Gender")!=-1:
               gender=splitted[i].split("=")[1]
         if(gender=="Fem" and gender!=""):
-          lemma=word[2][:-1]+"a" 
+          lemma=word[0][:-1]+"a" 
     #lemma=word[2]
     action = 'indef'
     result = []
@@ -102,6 +100,8 @@ def getInfo(word):
               keywords.append(keyword)
           except:
             print("Something went wrong")
+      if(keywords[0]!=token):
+        keywords=[]
       keywords=[s for s in keywords if s != lemma and s != word[2] ]
       present=False
       for keyword in keywords:
@@ -135,18 +135,26 @@ def getInfo(word):
       return result
     elif status == 404:
       print('404-no pictogram associated with this word exists =', lemma)
-      text_on_img(filename=str(index)+".png",text=lemma, size=100)
       print('saving img n: ',index)
+      if(type=='VERB' or type=='AUX'):
+        text_on_img(filename=str(index)+".png",text=token, size=100)
+        words_for_images.append(token)
+      else:
+        text_on_img(filename=str(index)+".png",text=lemma, size=100)
+        words_for_images.append(lemma)
       index+=1
-      words_for_images.append(lemma)
       
       return result
     elif status == 400:
       print('400-no pictogram associated with this word exists =', lemma)
-      text_on_img(filename=str(index)+".png",text=lemma, size=100)
       print('saving img n: ',index)
+      if(type=='VERB' or type=='AUX'):
+        text_on_img(filename=str(index)+".png",text=token, size=100)
+        words_for_images.append(token)
+      else:
+        text_on_img(filename=str(index)+".png",text=lemma, size=100)
+        words_for_images.append(lemma)
       index+=1
-      words_for_images.append(lemma)
       
       return result
     elif status == 500:
@@ -303,3 +311,4 @@ def startGUI():
   window.close()
 
 startGUI()
+
