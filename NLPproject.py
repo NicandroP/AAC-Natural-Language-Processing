@@ -33,6 +33,7 @@ def text_on_img(filename, text, size):
     image.save(path_CAA_pictograms+filename)
 
 def getInfo(word):
+    global index
     token = word[0]
     type=word[1]
     lemma=word[2]
@@ -119,31 +120,38 @@ def getInfo(word):
               return result
               break
     
-    response = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + lemma)#in questo modo ad es. la parola "dio" non la trova, mentre con il search normale si.?
+    response = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + lemma)
     j = response.json()
     status = response.status_code
     if status == 200:
       
       id = j[0]['_id'] #extract id by response
       result.append(id) #add to the list the id #ID [2]
-      index+=1
+      
       words_for_images.append(token)
+      
       return result
     elif status == 404:
-      print('no pictogram associated with this word exists =', lemma)
+      print('404-no pictogram associated with this word exists =', lemma)
       text_on_img(filename=str(index)+".png",text=lemma, size=100)
-      words_for_images.append(lemma)
+      print('saving img n: ',index)
       index+=1
+      words_for_images.append(lemma)
+      
       return result
     elif status == 400:
-      print('no pictogram associated with this word exists =', lemma)
+      print('400-no pictogram associated with this word exists =', lemma)
       text_on_img(filename=str(index)+".png",text=lemma, size=100)
-      words_for_images.append(lemma)
+      print('saving img n: ',index)
       index+=1
+      words_for_images.append(lemma)
+      
       return result
     elif status == 500:
-      words_for_images.append(lemma)
+      print('500 status')
       index+=1
+      words_for_images.append(lemma)
+      
       return result
     
 path_CAA_pictograms = 'C:/Users/nican/Desktop/NLP progetto/immagini/'
@@ -168,21 +176,27 @@ def getArray_id(words):
 
 def getImg(id, plural_status,action): #parameter:id, plural_status, action
   #print('id','id')
+  global index
   if plural_status=="Plur":
     #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_plural_300.png',
    path_CAA_pictograms+str(index)+'.png')
+    print('saving img n: ',index)
+    index+=1
     
   elif not action == 'indef':
     #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_action-'+action+'_300.png',
-   path_CAA_pictograms +str(index)+'.png') 
+   path_CAA_pictograms +str(index)+'.png')
+    print('saving img n: ',index)
+    index+=1
     
   else:
      #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_300.png',
    path_CAA_pictograms+str(index)+'.png')
-    
+    print('saving img n: ',index)
+    index+=1
 
 def translate(input_text):
   global index
@@ -194,7 +208,7 @@ def translate(input_text):
   #stanza.download('it')
   nlp=stanza.Pipeline('it',processors='tokenize,mwt,pos,lemma')
   frase=str(input_text)
-  print(frase)
+  #print(frase)
   frase=re.sub(r"[-()\"#/@;:<>{}`+=~|$%&]", "", frase)
   imagesList = listdir(path_CAA_pictograms)
   for i in imagesList:
@@ -215,7 +229,7 @@ def translate(input_text):
         lemma_sentence+=" "
       getArray_id(posT)
 
-      print(words_for_images)
+      print('words for images: ',words_for_images)
       imagesList = listdir(path_CAA_pictograms)
       n_images = len(imagesList)
       
@@ -286,4 +300,6 @@ def startGUI():
 
   window.close()
 
-startGUI()
+#startGUI()
+
+translate("non sopporto")
