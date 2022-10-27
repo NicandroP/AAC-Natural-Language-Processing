@@ -277,8 +277,7 @@ def startGUI():
   # All the stuff inside your window.
   layout = [  
               [sg.Text('Enter the sentence'), sg.Input(key='-INPUT-')],
-              [sg.Button('Translate'), sg.Button('Clear'), sg.Button('Cancel')],
-              [sg.Text(""), sg.Multiline(key='OUTPUT') ],
+              [sg.Submit('Translate'), sg.Button('Clear'), sg.Button('Cancel')],
               [sg.Image(size=(300, 300), key='-IMAGE-')]
               ]
 
@@ -298,7 +297,7 @@ def startGUI():
               v = values['-INPUT-']
               translate(v)
               executed=True
-              window['OUTPUT'].update(value=v)
+              #window['OUTPUT'].update(value=v)
               im = Image.open(path_CAA_pictograms+'figure.png')
               image = ImageTk.PhotoImage(image=im)
               window['-IMAGE-'].update(data=image)
