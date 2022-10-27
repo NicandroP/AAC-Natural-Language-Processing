@@ -273,7 +273,7 @@ words_for_images=[]
 def startGUI():
   executed=False
   v=""
-  sg.theme('DarkAmber')   # Add a touch of color
+  sg.theme('TealMono')   # Add a touch of color
   # All the stuff inside your window.
   layout = [  
               [sg.Text('Enter the sentence'), sg.Input(key='-INPUT-')],
