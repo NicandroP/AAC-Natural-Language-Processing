@@ -19,7 +19,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def text_on_img(filename, text, size):
-    "Draw a text on an Image, saves it, show it"
+
     fnt = ImageFont.truetype('arial.ttf', size)
     w,h = fnt.getsize(text)
     W=int(size/1.5)*len(text)
@@ -48,7 +48,7 @@ def getInfo(word):
             if splitted[i].find("Gender")!=-1:
               gender=splitted[i].split("=")[1]
         if(gender=="Fem" and gender!=""):
-          lemma=word[0][:-1]+"a" 
+          lemma=token
     #lemma=word[2]
     action = 'indef'
     result = []
@@ -170,10 +170,14 @@ path_CAA_pictograms = 'C:/Users/nican/Desktop/NLP progetto/immagini/'
 def getArray_id(words):
   array_id = []
   infos=[]
+  global pics
+  pics=[]
   global index
   while index<len(words):
     info = getInfo(words[index]) #TOKENCAA [0] | ACTION [1] | PLURAL_STATUS[2] | ID[3]
     print("info:",info)
+    if(len(info)==4):
+      pics.append(info[3])
     infos.append(info)
     if(len(info)==4):
 
@@ -241,6 +245,7 @@ def translate(input_text):
       getArray_id(posT)
 
       print('words for images: ',words_for_images)
+      print('pics: ',pics)
       imagesList = listdir(path_CAA_pictograms)
       n_images = len(imagesList)
       
@@ -265,10 +270,12 @@ def translate(input_text):
         plt.savefig(path_CAA_pictograms+'figure.png')
                       
       #plt.show()
+      return(pics)
 
 index=0
 lemma_sentence=""
 words_for_images=[]
+pics=[]
 
 def startGUI():
   executed=False
@@ -310,4 +317,23 @@ def startGUI():
 
   window.close()
 
-startGUI()
+
+def evaluation():
+  n_correct=0
+  df = pd.read_csv("C:/Users/nican/Desktop/NLP progetto/sentences.csv")
+  for i in range(len(df)):
+    lst=df["array_id"][i].split("[")[2].split("]")
+    lst = lst[:len(lst)-2]
+    lst=lst[0].split(",")
+    for k in range(len(lst)):
+      lst[k]=int(lst[k])
+    df["array_id"][i]=lst
+
+  for i in range(len(df)):
+    if(translate(df["sentence"][i])==df["array_id"][i]):
+      n_correct+=1
+      print("originale: ",df["array_id"][i])
+    if(i==5):
+      break
+    
+  print(n_correct)
