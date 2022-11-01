@@ -339,4 +339,3 @@ def evaluation():
   print(n_correct)
 
 #startGUI()
-translate("Il dono del Natale")
