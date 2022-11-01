@@ -101,8 +101,8 @@ def getInfo(word):
           except:
             print("Something went wrong")
       if(len(keywords)>0):
-        if(keywords[0]!=token):
-          keywords=[]
+        """if(keywords[0]!=token):
+          keywords=[]"""
         keywords=[s for s in keywords if s != lemma and s != word[2] ]
         present=False
         for keyword in keywords:
@@ -214,6 +214,9 @@ def getImg(id, plural_status,action): #parameter:id, plural_status, action
     index+=1
 
 def translate(input_text):
+  imagesList = listdir(path_CAA_pictograms)
+  for i in imagesList:
+    os.remove(path_CAA_pictograms+i)
   global index
   index=0
   global lemma_sentence
@@ -225,9 +228,6 @@ def translate(input_text):
   frase=str(input_text)
   #print(frase)
   frase=re.sub(r"[-()\"#/@;:<>{}`+=~|$%&]", "", frase)
-  imagesList = listdir(path_CAA_pictograms)
-  for i in imagesList:
-    os.remove(path_CAA_pictograms+i)
   #frase= input()
   #words_for_images=[]
   doc=nlp(frase)
@@ -268,7 +268,7 @@ def translate(input_text):
         ax.xaxis.set_visible(False)
         ax.title.set_text(words_for_images[0])
         plt.savefig(path_CAA_pictograms+'figure.png')
-                      
+        #ERRORE SOVRAPPOSIZIONE IMMAGINI NELLA FIGURE.PNG       
       #plt.show()
       return(pics)
 
@@ -311,7 +311,6 @@ def startGUI():
 
       elif event=='Clear':
           window.FindElement('-INPUT-').Update('')
-          window.FindElement('OUTPUT').Update('')
           window.FindElement('-IMAGE-').Update('')
           executed=False
 
@@ -337,3 +336,5 @@ def evaluation():
       break
     
   print(n_correct)
+
+startGUI()
