@@ -43,7 +43,7 @@ def text_on_img(filename, text, size):
     if(len(text)<5):
       fnt = ImageFont.truetype('arial.ttf', size)
     else:
-      size=size-40
+      size=size-30
       fnt = ImageFont.truetype('arial.ttf', size)
     #fnt = ImageFont.truetype('arial.ttf', size)
     W, H = (280,280)
@@ -53,7 +53,7 @@ def text_on_img(filename, text, size):
     w, h = draw.textsize(text,font=fnt)
     # draw text
     draw.text((((W-w)/2,(H-h)/2)), text,font=fnt, fill=(0,0,0))
-    #  save file
+    # save file
     image.save(path_CAA_pictograms+filename)
 
 def getInfo(word):
@@ -69,8 +69,8 @@ def getInfo(word):
       lemma=word[2]
     
     gender=""
-    if(type=='DET'):
-      lemma=token
+    """if(type=='DET'):
+      lemma=token"""
     if(type=='NOUN' or type=='DET' or type=='PRON' or type=='ADJ'):
       if(word[3]!=None):
 
@@ -270,6 +270,9 @@ def translate(input_text):
   frase=str(input_text)
   #print(frase)
   frase=re.sub(r"[-()\"#/@;:<>{}`+=~|$%&]", "", frase)
+  frase=frase.replace("'","' ")
+  frase=frase.replace("?"," ?")
+  frase=frase.replace("!"," !")
   #frase= input()
   doc=nlp(frase)
   lemmas=[]
@@ -297,7 +300,11 @@ def translate(input_text):
           ax.xaxis.set_visible(False)
           ax.yaxis.set_visible(False)
         for ax,j in zip(fig.axes,range(len(words_for_images))):
-          ax.title.set_text(words_for_images[j])
+          #ax.title.set_text(words_for_images[j])
+          if(len(words_for_images[j])>5 and len(words_for_images)>5):
+            ax.set_title(words_for_images[j], fontsize=10)
+          else:  
+            ax.set_title(words_for_images[j], fontsize=15)
         plt.savefig(path_CAA_pictograms+'figure.png')
       elif(n_images==1):
         plt.figure().clear()
