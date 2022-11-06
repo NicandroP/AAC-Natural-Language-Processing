@@ -71,6 +71,8 @@ def getInfo(word):
     gender=""
     """if(type=='DET'):
       lemma=token"""
+    if(type=='NOUN'):
+      lemma=token
     if(type=='NOUN' or type=='DET' or type=='PRON' or type=='ADJ'):
       if(word[3]!=None):
 
