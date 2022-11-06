@@ -17,7 +17,27 @@ import numpy as np
 from PIL import Image, ImageTk,ImageDraw,ImageFont
 import warnings
 warnings.filterwarnings("ignore")
+#stanza.download('it')
+nlp=stanza.Pipeline('it',processors='tokenize,pos,lemma',tokenize_pretokenized=True)
 
+def try_synset(lemmax):
+  global synsetFound
+  from nltk.corpus import wordnet as wn
+  synsetsList=[]
+  for synset in wn.synsets(lemmax,lang=('ita')):
+      for lemma in synset.lemma_names(u'ita'):
+          if(lemmax!=lemma):
+            synsetsList.append(lemma)
+  #print(synsetsList)
+  for i in range(len(synsetsList)):
+    response = requests.get("https://api.arasaac.org/api/pictograms/it/search/" + synsetsList[i])
+    status = response.status_code
+    if status == 200:
+      synsetFound=True
+      j = response.json()
+      id = j[0]['_id']
+      return id
+  
 def text_on_img(filename, text, size):
 
     fnt = ImageFont.truetype('arial.ttf', size)
@@ -33,10 +53,17 @@ def text_on_img(filename, text, size):
     image.save(path_CAA_pictograms+filename)
 
 def getInfo(word):
+    global synsetFound
+    synsetFound=False
     global index
-    token = word[0]
     type=word[1]
-    lemma=word[2]
+    if(type!='PROPN'):
+      token=word[0].lower()
+      lemma=word[2].lower()
+    else:
+      token = word[0]
+      lemma=word[2]
+    
     gender=""
     if(type=='DET'):
       lemma=token
@@ -99,12 +126,15 @@ def getInfo(word):
             if(len(keyword)>=len(token)):
               if(len(keyword)>3):
                 keywords.append(keyword)
+            if(len(keywords)==10):
+              break
           except:
             print("Something went wrong")
       if(len(keywords)>0):
         """if(keywords[0]!=token):
           keywords=[]"""
         keywords=[s for s in keywords if s != lemma and s != word[2] ]
+        #print(keywords)
         present=False
         for keyword in keywords:
             
@@ -136,20 +166,29 @@ def getInfo(word):
       
       return result
     elif status == 404:
-      print('404-no pictogram associated with this word exists =', lemma)
-      print('saving img n: ',index)
-      if(type=='VERB' or type=='AUX'):
-        text_on_img(filename=str(index)+".png",text=token, size=100)
+      print('404-no pictogram associated with this word exists =', lemma,"lets try with synsets")
+      id=try_synset(lemma)
+      if(synsetFound==True):
+        result.append(id)
         words_for_images.append(token)
+        return result
       else:
-        text_on_img(filename=str(index)+".png",text=lemma, size=100)
-        words_for_images.append(lemma)
-      index+=1
-      
-      return result
+          
+        print("No synset found")
+        #print('saving img n: ',index)
+        if(type=='VERB' or type=='AUX'):
+          text_on_img(filename=str(index)+".png",text=token, size=100)
+          words_for_images.append(token)
+        else:
+          text_on_img(filename=str(index)+".png",text=lemma, size=100)
+          words_for_images.append(lemma)
+        index+=1
+        return result
+
     elif status == 400:
-      print('400-no pictogram associated with this word exists =', lemma)
-      print('saving img n: ',index)
+      print('400-no pictogram associated with this word exists =', lemma,"lets try with synsets")
+      try_synset(lemma)
+      #print('saving img n: ',index)
       if(type=='VERB' or type=='AUX'):
         text_on_img(filename=str(index)+".png",text=token, size=100)
         words_for_images.append(token)
@@ -176,7 +215,7 @@ def getArray_id(words):
   global index
   while index<len(words):
     info = getInfo(words[index]) #TOKENCAA [0] | ACTION [1] | PLURAL_STATUS[2] | ID[3]
-    print("info:",info)
+    #print("info:",info)
     if(len(info)==4):
       pics.append(info[3])
     infos.append(info)
@@ -197,21 +236,21 @@ def getImg(id, plural_status,action): #parameter:id, plural_status, action
     #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_plural_300.png',
    path_CAA_pictograms+str(index)+'.png')
-    print('saving img n: ',index)
+    #print('saving img n: ',index)
     index+=1
     
   elif not action == 'indef':
     #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_action-'+action+'_300.png',
    path_CAA_pictograms +str(index)+'.png')
-    print('saving img n: ',index)
+    #print('saving img n: ',index)
     index+=1
     
   else:
      #Copy a network object denoted by a URL to a local file
     urllib.request.urlretrieve('https://static.arasaac.org/pictograms/'+str(id)+'/'+str(id)+'_300.png',
    path_CAA_pictograms+str(index)+'.png')
-    print('saving img n: ',index)
+    #print('saving img n: ',index)
     index+=1
 
 def translate(input_text):
@@ -224,15 +263,11 @@ def translate(input_text):
   lemma_sentence=""
   global words_for_images
   words_for_images=[]
-  #stanza.download('it')
-  nlp=stanza.Pipeline('it',processors='tokenize,mwt,pos,lemma')
   frase=str(input_text)
   #print(frase)
   frase=re.sub(r"[-()\"#/@;:<>{}`+=~|$%&]", "", frase)
   #frase= input()
-  #words_for_images=[]
   doc=nlp(frase)
-  #index=0
   lemmas=[]
   for sentence in doc.sentences:
       posT=[(w.text, w.pos,w.lemma,w.feats) for w in sentence.words]
@@ -251,7 +286,6 @@ def translate(input_text):
       n_images = len(imagesList)
       
       if(n_images>1):
-
         fig, axes = plt.subplots(1,n_images)
         for ax, imgname in zip(axes, imagesList):
           img = plt.imread(path_CAA_pictograms+imgname)
@@ -262,14 +296,16 @@ def translate(input_text):
           ax.title.set_text(words_for_images[j])
         plt.savefig(path_CAA_pictograms+'figure.png')
       elif(n_images==1):
+        plt.figure().clear()
+        plt.cla()
+        plt.clf()
         img = plt.imread(path_CAA_pictograms+imagesList[0])
         imgplot = plt.imshow(img)
         ax = plt.gca()
         ax.yaxis.set_visible(False)
         ax.xaxis.set_visible(False)
         ax.title.set_text(words_for_images[0])
-        plt.savefig(path_CAA_pictograms+'figure.png')
-        #ERRORE SOVRAPPOSIZIONE IMMAGINI NELLA FIGURE.PNG       
+        plt.savefig(path_CAA_pictograms+'figure.png') 
       #plt.show()
       return(pics)
 
@@ -317,7 +353,6 @@ def startGUI():
 
   window.close()
 
-
 def evaluation():
   n_correct=0
   df = pd.read_csv("C:/Users/nican/Desktop/NLP progetto/sentences.csv")
@@ -338,4 +373,4 @@ def evaluation():
     
   print(n_correct)
 
-#startGUI()
+startGUI()
