@@ -40,15 +40,19 @@ def try_synset(lemmax):
   
 def text_on_img(filename, text, size):
 
-    fnt = ImageFont.truetype('arial.ttf', size)
-    w,h = fnt.getsize(text)
-    W=int(size/1.5)*len(text)
-    H=size+50
+    if(len(text)<5):
+      fnt = ImageFont.truetype('arial.ttf', size)
+    else:
+      size=size-40
+      fnt = ImageFont.truetype('arial.ttf', size)
+    #fnt = ImageFont.truetype('arial.ttf', size)
+    W, H = (280,280)
     # create image
-    image = Image.new(mode = "RGB", size = (int(size/1.5)*len(text),size+50), color = "white")
+    image = Image.new(mode = "RGB", size = (W,H), color = "white")
     draw = ImageDraw.Draw(image)
+    w, h = draw.textsize(text,font=fnt)
     # draw text
-    draw.text(((W-w)/2,(H-h)/2), text, font=fnt, fill=(0,0,0))
+    draw.text((((W-w)/2,(H-h)/2)), text,font=fnt, fill=(0,0,0))
     # save file
     image.save(path_CAA_pictograms+filename)
 
