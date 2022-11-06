@@ -53,7 +53,7 @@ def text_on_img(filename, text, size):
     w, h = draw.textsize(text,font=fnt)
     # draw text
     draw.text((((W-w)/2,(H-h)/2)), text,font=fnt, fill=(0,0,0))
-    # save file
+    #  save file
     image.save(path_CAA_pictograms+filename)
 
 def getInfo(word):
