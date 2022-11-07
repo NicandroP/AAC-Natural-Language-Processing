@@ -294,7 +294,7 @@ def translate(input_text):
       imagesList = listdir(path_CAA_pictograms)
       n_images = len(imagesList)
       
-      if(n_images>1):
+      if(n_images>1):  
         fig, axes = plt.subplots(1,n_images)
         for ax, imgname in zip(axes, imagesList):
           img = plt.imread(path_CAA_pictograms+imgname)
@@ -386,4 +386,5 @@ def evaluation():
     
   print(n_correct)
 
-startGUI()
+#startGUI()
+translate("ciao")
