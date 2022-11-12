@@ -98,9 +98,7 @@ def getInfo(word):
     
     if (type == 'VERB'):
         if not word[3].split("=")[1]=="Inf":
-              
             tense=word[3].split("|")[2].split("=")[1]
-            
             if(tense=="Past" or tense=="Imp"):
               action="past"
             if(tense=="Fut"):
@@ -387,4 +385,10 @@ def evaluation():
   print(n_correct)
 
 #startGUI()
-translate("ciao")
+#translate("campo da tennis")
+
+"""from nltk.translate.bleu_score import sentence_bleu
+reference = ['gioco', 'in', 'un', 'campo','da','tennis']
+candidate = ['Gioco', 'in', 'un', 'campo','da','tennis']
+score = sentence_bleu(reference, candidate)
+print(score)"""
