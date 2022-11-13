@@ -142,12 +142,12 @@ def getInfo(word):
         present=False
         for keyword in keywords:
             
-            if lemma_sentence.find(keyword)!=-1:
+            if lemma_sentence.find(keyword.lower())!=-1:
                 present=True
                 words=len(keyword.split(" "))
-                print(words,": ",keyword)
+                #print(words,": ",keyword)
                 global index
-                index+=words
+                #index+=words
                 global words_for_images
                 words_for_images.append(keyword)
                 response2 = requests.get("https://api.arasaac.org/api/pictograms/it/bestsearch/" + keyword)
@@ -218,6 +218,7 @@ def getArray_id(words):
   pics=[]
   global index
   while index<len(words):
+    #print(index)
     info = getInfo(words[index]) #TOKENCAA [0] | ACTION [1] | PLURAL_STATUS[2] | ID[3]
     #print("info:",info)
     if(len(info)==4):
@@ -278,7 +279,7 @@ def translate(input_text):
   lemmas=[]
   for sentence in doc.sentences:
       posT=[(w.text, w.pos,w.lemma,w.feats) for w in sentence.words]
-      print(posT)
+      #print(posT)
       for i in posT:
         lemmas.append(i[2])
       lemma_sentence=""
@@ -287,8 +288,8 @@ def translate(input_text):
         lemma_sentence+=" "
       getArray_id(posT)
 
-      print('words for images: ',words_for_images)
-      print('pics: ',pics)
+      #print('words for images: ',words_for_images)
+      #print('pics: ',pics)
       imagesList = listdir(path_CAA_pictograms)
       n_images = len(imagesList)
       
@@ -365,30 +366,23 @@ def startGUI():
   window.close()
 
 def evaluation():
-  n_correct=0
-  df = pd.read_csv("C:/Users/nican/Desktop/NLP progetto/sentences.csv")
+  from difflib import SequenceMatcher
+  df = pd.read_csv("C:/Users/nican/Desktop/NLP progetto/book.csv", delimiter=";")
+  avg_score=0
   for i in range(len(df)):
-    lst=df["array_id"][i].split("[")[2].split("]")
-    lst = lst[:len(lst)-2]
-    lst=lst[0].split(",")
-    for k in range(len(lst)):
-      lst[k]=int(lst[k])
-    df["array_id"][i]=lst
-
-  for i in range(len(df)):
-    if(translate(df["sentence"][i])==df["array_id"][i]):
-      n_correct+=1
-      print("originale: ",df["array_id"][i])
-    if(i==5):
-      break
+    translation=translate(df["sentence"][i])
     
-  print(n_correct)
+    lst=df["array_id"][i]
+    lst=lst.split(",")
+    for i in range(len(lst)):
+      lst[i]=int(lst[i])
 
+    sm=SequenceMatcher(None,translation,lst)
+    print(translation," - ",lst," - ",sm.ratio())
+    avg_score+=sm.ratio()
+  avg_score=avg_score/len(df)
+  print(avg_score)
+
+evaluation()
 #startGUI()
-#translate("campo da tennis")
-
-"""from nltk.translate.bleu_score import sentence_bleu
-reference = ['gioco', 'in', 'un', 'campo','da','tennis']
-candidate = ['Gioco', 'in', 'un', 'campo','da','tennis']
-score = sentence_bleu(reference, candidate)
-print(score)"""
+#translate("molto tempo fa")
